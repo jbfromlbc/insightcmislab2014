@@ -51,6 +51,22 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 
 	}
 
+	  /**
+     * Initializes the wrapper with a set of optional parameters from the properties file
+     */
+	@Override
+    public void initialize(Object[] params) {
+		
+		// TBD - add paragraph explaining how this gets called once for each extension
+		// giving the extension an opportunity to cache any of its optional parameters. 
+		// 
+		LOG.info("Initializing the CmisCustomPdfWatermarkServiceWrapper.");
+		
+		// store the filter value here
+	   
+    }
+	
+	
 	/**
 	 * slf logging version with dual output to console and slf 
 	 */
