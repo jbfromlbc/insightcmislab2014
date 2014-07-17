@@ -54,12 +54,6 @@ public class CmisCustomLoggingServiceWrapper extends AbstractCmisServiceWrapper 
 
 		LOG.info("Operation: {}, Repository ID: {}, Binding: {}, User Agent: {}", operation, repositoryId, binding,
 				userAgent);
-		
-		// also dump to console for testing
-		String result =
-		String.format("Operation: %s, Repository ID: %s, Binding: %s, User Agent: %s", 
-				operation, repositoryId, binding, userAgent);
-		System.out.println(result);
 	}
 	
 	@Override
@@ -81,7 +75,7 @@ public class CmisCustomLoggingServiceWrapper extends AbstractCmisServiceWrapper 
 	
 		// dual log output in case logger not configured
 		LOG.info("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):" + (System.currentTimeMillis() - startTime));
-		System.out.println("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):" + (System.currentTimeMillis() - startTime));
+		//System.out.println("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):" + (System.currentTimeMillis() - startTime));
 		return retVal;
 	}
 

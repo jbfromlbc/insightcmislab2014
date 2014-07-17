@@ -58,9 +58,14 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
     public void initialize(Object[] params) {
 		
 		// TBD - add paragraph explaining how this gets called once for each extension
+		// TBD - find out if this is true - why is this called for every request?
 		// giving the extension an opportunity to cache any of its optional parameters. 
 		// 
 		LOG.info("Initializing the CmisCustomPdfWatermarkServiceWrapper.");
+		
+		for (Object parm : params) {
+				LOG.info("[CmisCustomPdfWatermarkServiceWrapper]Parameter:" + parm.toString() );
+		}
 		
 		// store the filter value here
 	   
@@ -85,12 +90,6 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 
 		LOG.info("Operation: {}, Repository ID: {}, Binding: {}, User Agent: {}", operation, repositoryId, binding,
 				userAgent);
-		
-		// also dump to console for testing
-		String result =
-		String.format("Operation: %s, Repository ID: %s, Binding: %s, User Agent: %s", 
-				operation, repositoryId, binding, userAgent);
-		System.out.println(result);
 	}
 	
 
@@ -146,7 +145,7 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 		
 		// dual log output in case logger not configured
 		LOG.info("[CmisCustomServiceWrapper] Exiting method getContentStream. time (ms):" + (System.currentTimeMillis() - startTime));
-		System.out.println("[CmisCustomServiceWrapper] Exiting method getContentStream. time (ms):" + (System.currentTimeMillis() - startTime));
+		//System.out.println("[CmisCustomServiceWrapper] Exiting method getContentStream. time (ms):" + (System.currentTimeMillis() - startTime));
 		
 		return retVal;     
 	}

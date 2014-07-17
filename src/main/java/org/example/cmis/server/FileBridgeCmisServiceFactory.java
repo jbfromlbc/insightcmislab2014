@@ -81,16 +81,20 @@ public class FileBridgeCmisServiceFactory extends AbstractServiceFactory {
 
     @Override
     public void init(Map<String, String> parameters) {   	
+    	LOG.debug("[FileBridgeCmisServiceFactory] init");
+    	
     	// New for Chameleon **
     	wrapperManager = new CmisServiceWrapperManager();
  	    wrapperManager.addWrappersFromServiceFactoryParameters(parameters);
  	    wrapperManager.addOuterWrapper(ConformanceCmisServiceWrapper.class, DEFAULT_MAX_ITEMS_TYPES,
  	                DEFAULT_DEPTH_TYPES, DEFAULT_MAX_ITEMS_OBJECTS, DEFAULT_DEPTH_OBJECTS);
+ 	    
+ 	    
     	// *******
  	    // lets print out the parameters for debugging purposes so we can see what happens to our
  	    // custom parameters
  	    for (String currentKey : parameters.keySet()) {
- 	    	System.out.println("Key: " + currentKey + " ->Value:" + parameters.get(currentKey) ); 
+ 	    	LOG.debug("[FileBridgeCmisServiceFactory]Key: " + currentKey + " ->Value:" + parameters.get(currentKey) ); 
  	    }
  	    
     	repositoryManager = new FileBridgeRepositoryManager();
