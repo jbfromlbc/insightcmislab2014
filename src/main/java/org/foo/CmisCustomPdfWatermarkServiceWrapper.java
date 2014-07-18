@@ -45,6 +45,11 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 	// slf4j example
 	private static final Logger LOG = LoggerFactory.getLogger(CmisCustomPdfWatermarkServiceWrapper.class);
 	
+	// constants for this extension
+	public static final String USER_FILTER_NAME = "userfilter";
+	
+	private String userToWatermark = null;
+	
 	// provide constructor
 	public CmisCustomPdfWatermarkServiceWrapper(CmisService service) {
 		super(service);
@@ -57,17 +62,26 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 	@Override
     public void initialize(Object[] params) {
 		
-		// TBD - add paragraph explaining how this gets called once for each extension
-		// TBD - find out if this is true - why is this called for every request?
-		// giving the extension an opportunity to cache any of its optional parameters. 
-		// 
+		//Whenever CmisServiceWrapperManager.wrap() is called, a new wrapper instance is created and 
+		//  the corresponding initialize() method is called.
+		//If the service factory creates a new CmisService object and wraps it with every request, 
+		//  then new wrapper instances are created and initialized for every request.
+		//This is why in this case you will see initialize get called for every request. 
+		//Depending on your implementation you may only see this called once. 
+		
 		LOG.info("Initializing the CmisCustomPdfWatermarkServiceWrapper.");
 		
 		for (Object parm : params) {
-				LOG.info("[CmisCustomPdfWatermarkServiceWrapper]Parameter:" + parm.toString() );
+			LOG.info("[CmisCustomPdfWatermarkServiceWrapper]Parameter:" + parm.toString() );
+			
+			// Let's store the id of the user that we want to flag for watermarking. 
+			String[] parts = parm.toString().split("=");
+			
+			if (USER_FILTER_NAME.equalsIgnoreCase(parts[0])) {
+				// we have a user 
+				userToWatermark = parts[1];
+			}
 		}
-		
-		// store the filter value here
 	   
     }
 	
@@ -109,41 +123,42 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 	
 		MutableContentStream retVal = (MutableContentStream)getWrappedService().getContentStream(repositoryId, objectId, streamId, offset, length, extension);
 	
-		if ((retVal != null) && (retVal.getMimeType().contains("pdf"))) {					
-			InputStream rawStream = retVal.getStream();
-			
-			// return a pdfbox document object
-			// for debugging only - load to pdfbox and stream out
-			//PDDocument modifiedPDF = watermarkPDF_loadOnly(rawStream);
-			// actual watermark code
-			PDDocument modifiedPDF = watermarkPDF(rawStream);
+		if (sharedContext.getUsername().equalsIgnoreCase(userToWatermark)) {
+			if ((retVal != null) && (retVal.getMimeType().contains("pdf"))) {					
+				InputStream rawStream = retVal.getStream();
 				
-			// Extra credit here.  Replace with ThresholdOutputStream or find another 
-			// way to handle very large objects in a small memory footprint. 
-			//ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ThresholdOutputStream out = ((ThresholdOutputStreamFactory) sharedContext.get(CallContext.STREAM_FACTORY)).newOutputStream();
-			
-			try {
-			   modifiedPDF.save(out);
-			   modifiedPDF.close();
-			   InputStream modifiedInputStream = out.getInputStream(); //new ByteArrayInputStream(out.toByteArray());
-				
-				// now write the stream back to the ContentStream object
-				retVal.setStream(modifiedInputStream);
-				
-			} catch (Exception e) {
-				slflog("error transposing stream getContentStream ",  e.getMessage());
+				// return a pdfbox document object
+				// for debugging only - load to pdfbox and stream out
+				//PDDocument modifiedPDF = watermarkPDF_loadOnly(rawStream);
+				// actual watermark code
+				PDDocument modifiedPDF = watermarkPDF(rawStream);
+					
+				// Extra credit here.  Replace with ThresholdOutputStream or find another 
+				// way to handle very large objects in a small memory footprint. 
+				//ByteArrayOutputStream out = new ByteArrayOutputStream();
+				ThresholdOutputStream out = ((ThresholdOutputStreamFactory) sharedContext.get(CallContext.STREAM_FACTORY)).newOutputStream();
 				
 				try {
-					// since there was an error restore the original stream without the watermark
-					retVal.getStream().reset();
-				} catch (IOException e1) {
-					e1.printStackTrace();  // serious problem
+				   modifiedPDF.save(out);
+				   modifiedPDF.close();
+				   InputStream modifiedInputStream = out.getInputStream(); //new ByteArrayInputStream(out.toByteArray());
+					
+					// now write the stream back to the ContentStream object
+					retVal.setStream(modifiedInputStream);
+					
+				} catch (Exception e) {
+					slflog("error transposing stream getContentStream ",  e.getMessage());
+					
+					try {
+						// since there was an error restore the original stream without the watermark
+						retVal.getStream().reset();
+					} catch (IOException e1) {
+						e1.printStackTrace();  // serious problem
+					}
 				}
-			}
-		}  // if pdf stream
+			}  	// if pdf stream
+		}   	// if user matches filter param
 		
-		// dual log output in case logger not configured
 		LOG.info("[CmisCustomServiceWrapper] Exiting method getContentStream. time (ms):" + (System.currentTimeMillis() - startTime));
 		//System.out.println("[CmisCustomServiceWrapper] Exiting method getContentStream. time (ms):" + (System.currentTimeMillis() - startTime));
 		
