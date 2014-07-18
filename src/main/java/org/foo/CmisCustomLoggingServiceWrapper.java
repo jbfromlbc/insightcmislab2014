@@ -61,7 +61,7 @@ public class CmisCustomLoggingServiceWrapper extends AbstractCmisServiceWrapper 
 			Boolean includeAllowableActions, IncludeRelationships includeRelationships, String renditionFilter,
 			Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
 
-		slflog("getChildren override from customer Chameleon module --------------", repositoryId);
+		slflog("getChildren ", repositoryId);
 		long startTime = System.currentTimeMillis();
 
 		CallContext sharedContext = this.getCallContext();
