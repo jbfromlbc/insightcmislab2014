@@ -48,7 +48,7 @@
 <h1>FileBridge Server</h1>
 
 <p style="font-weight: bold">Your server is up and running.</p>
-<p>The server server is a CMIS server based on Apache Chemistry OpenCMIS.</p>
+<p>The server server is a CMIS server based on Apache Chemistry OpenCMIS. (with extensions)</p>
 <p>You need a CMIS client to access this server. Download the <a href="http://chemistry.apache.org/java/developing/tools/dev-tools-workbench.html">CMIS Workbench</a>.</p>
 
 <h2>Access Information</h2>
