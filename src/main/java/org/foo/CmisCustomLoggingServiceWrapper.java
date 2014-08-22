@@ -1,7 +1,9 @@
 package org.foo;
 
 import java.math.BigInteger;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.chemistry.opencmis.commons.data.ExtensionsData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderList;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
@@ -12,71 +14,76 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Example of a minimal Cmis Custom Service Wrapper (logging example)
+ * Example of a minimal CMIS Custom Service Wrapper (logging example)
  * 
- * Add the following ** to the repo.properties to have framework hook into chain
- * The number at the key is the position in the wrapper stack. Lower numbers are
- * outer wrappers, higher numbers are inner wrappers.
+ * Add the following ** to the repository.properties to have framework hook into
+ * chain. The number at the key is the position in the wrapper stack. Lower
+ * numbers are outer wrappers, higher numbers are inner wrappers.
  *
- * ** add the following line to your repo.properties file in your servers war 
- * servicewrapper.1=org.apache.chemistry.opencmis.server.support.CmisCustomLoggingServiceWrapper
+ * ** add the following line to your repository.properties file in your servers
+ * war:
  * 
- * See the frameworks SimpleLoggingCmisServiceWrapper for a more generic and
- * complete example
- * 
+ * <pre>
+ * servicewrapper.1=org.foo.CmisCustomLoggingServiceWrapper
+ * </pre>
  */
 public class CmisCustomLoggingServiceWrapper extends AbstractCmisServiceWrapper {
 
-	// slf4j example
-	private static final Logger LOG = LoggerFactory.getLogger(CmisCustomLoggingServiceWrapper.class);
-	
-	// provide constructor
-	public CmisCustomLoggingServiceWrapper(CmisService service) {
-		super(service);
+    // slf4j example
+    private static final Logger LOG = LoggerFactory.getLogger(CmisCustomLoggingServiceWrapper.class);
 
-	}
+    // provide constructor
+    public CmisCustomLoggingServiceWrapper(CmisService service) {
+        super(service);
 
-	/**
-	 * slf logging version with dual output to console and slf 
-	 */
-	protected void slflog(String operation, String repositoryId) {
-		if (repositoryId == null) {
-			repositoryId = "<none>";
-		}
+    }
 
-		HttpServletRequest request = (HttpServletRequest) getCallContext().get(CallContext.HTTP_SERVLET_REQUEST);
-		String userAgent = request.getHeader("User-Agent");
-		if (userAgent == null) {
-			userAgent = "<unknown>";
-		}
+    /**
+     * slf logging version with dual output to console and slf
+     */
+    protected void slflog(String operation, String repositoryId) {
+        if (repositoryId == null) {
+            repositoryId = "<none>";
+        }
 
-		String binding = getCallContext().getBinding();
+        HttpServletRequest request = (HttpServletRequest) getCallContext().get(CallContext.HTTP_SERVLET_REQUEST);
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent == null) {
+            userAgent = "<unknown>";
+        }
 
-		LOG.info("Operation: {}, Repository ID: {}, Binding: {}, User Agent: {}", operation, repositoryId, binding,
-				userAgent);
-	}
-	
-	@Override
-	public ObjectInFolderList getChildren(String repositoryId, String folderId, String filter, String orderBy,
-			Boolean includeAllowableActions, IncludeRelationships includeRelationships, String renditionFilter,
-			Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
+        String binding = getCallContext().getBinding();
 
-		slflog("getChildren ", repositoryId);
-		long startTime = System.currentTimeMillis();
+        LOG.info("Operation: {}, Repository ID: {}, Binding: {}, User Agent: {}", operation, repositoryId, binding,
+                userAgent);
+    }
 
-		CallContext sharedContext = this.getCallContext();
+    @Override
+    public ObjectInFolderList getChildren(String repositoryId, String folderId, String filter, String orderBy,
+            Boolean includeAllowableActions, IncludeRelationships includeRelationships, String renditionFilter,
+            Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
 
-		// Get the native domain object from the call context if one is shared by the vendor (example only)
-		// Your CMIS vendor's documentation must expose the name of any shared objects they place here for extensions.
-		// Object objShared = sharedContext.get("shared_key_name_from_vendor");
-	
-		ObjectInFolderList retVal = getWrappedService().getChildren(repositoryId, folderId, filter, orderBy, includeAllowableActions,
-				includeRelationships, renditionFilter, includePathSegment, maxItems, skipCount, extension);
-	
-		// dual log output in case logger not configured
-		LOG.info("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):" + (System.currentTimeMillis() - startTime));
-		//System.out.println("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):" + (System.currentTimeMillis() - startTime));
-		return retVal;
-	}
+        slflog("getChildren ", repositoryId);
+        long startTime = System.currentTimeMillis();
+
+        CallContext sharedContext = this.getCallContext();
+
+        // Get the native domain object from the call context if one is shared
+        // by the vendor (example only)
+        // Your CMIS vendor's documentation must expose the name of any shared
+        // objects they place here for extensions.
+        // Object objShared = sharedContext.get("shared_key_name_from_vendor");
+
+        ObjectInFolderList retVal = getWrappedService().getChildren(repositoryId, folderId, filter, orderBy,
+                includeAllowableActions, includeRelationships, renditionFilter, includePathSegment, maxItems,
+                skipCount, extension);
+
+        // dual log output in case logger not configured
+        LOG.info("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):"
+                + (System.currentTimeMillis() - startTime));
+        // System.out.println("[CmisCustomServiceWrapper] Exiting method getChildren. time (ms):"
+        // + (System.currentTimeMillis() - startTime));
+        return retVal;
+    }
 
 }
