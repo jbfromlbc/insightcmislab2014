@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ExtensionsData;
-import org.apache.chemistry.opencmis.commons.data.MutableContentStream;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.CmisService;
 import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStream;
@@ -53,7 +54,6 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 	// provide constructor
 	public CmisCustomPdfWatermarkServiceWrapper(CmisService service) {
 		super(service);
-
 	}
 
 	  /**
@@ -121,7 +121,7 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 		// Your CMIS vendor's documentation must expose the name of any shared objects they place here for extensions.
 		// Object objShared = sharedContext.get("shared_key_name_from_vendor");
 	
-		MutableContentStream retVal = (MutableContentStream)getWrappedService().getContentStream(repositoryId, objectId, streamId, offset, length, extension);
+		ContentStream retVal = getWrappedService().getContentStream(repositoryId, objectId, streamId, offset, length, extension);
 	
 		if (sharedContext.getUsername().equalsIgnoreCase(userToWatermark)) {
 			if ((retVal != null) && (retVal.getMimeType().contains("pdf"))) {					
@@ -136,7 +136,16 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 				// Extra credit here.  Replace with ThresholdOutputStream or find another 
 				// way to handle very large objects in a small memory footprint. 
 				//ByteArrayOutputStream out = new ByteArrayOutputStream();
-				ThresholdOutputStream out = ((ThresholdOutputStreamFactory) sharedContext.get(CallContext.STREAM_FACTORY)).newOutputStream();
+				ThresholdOutputStream out;
+				ThresholdOutputStreamFactory outFactory = (ThresholdOutputStreamFactory) sharedContext.get(CallContext.STREAM_FACTORY);
+				if(outFactory != null) {
+				    // reuse the server factory configuration 
+				    out = outFactory.newOutputStream();
+				} else {
+				    // there is no default ThresholdOutputStreamFactory
+				    // -> create a stream manually: default temp directory, max 4MiB in main memory, unlimited content size
+				    out = new ThresholdOutputStream(null, 4 * 1024 * 1024, -1);
+				}
 				
 				try {
 				   modifiedPDF.save(out);
@@ -144,17 +153,13 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 				   InputStream modifiedInputStream = out.getInputStream(); //new ByteArrayInputStream(out.toByteArray());
 					
 					// now write the stream back to the ContentStream object
-					retVal.setStream(modifiedInputStream);
+				   retVal = new ContentStreamImpl(retVal.getFileName(), null, "application/pdf", modifiedInputStream);
 					
 				} catch (Exception e) {
 					slflog("error transposing stream getContentStream ",  e.getMessage());
 					
-					try {
-						// since there was an error restore the original stream without the watermark
-						retVal.getStream().reset();
-					} catch (IOException e1) {
-						e1.printStackTrace();  // serious problem
-					}
+					LOG.error("Could not watermark PDF document: {}", e.getMessage(), e);
+					throw new CmisRuntimeException("Could not watermark PDF document!");
 				}
 			}  	// if pdf stream
 		}   	// if user matches filter param
