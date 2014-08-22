@@ -38,8 +38,6 @@ import org.apache.chemistry.opencmis.server.support.wrapper.ConformanceCmisServi
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 /**
  * FileShare Service Factory.
  */
@@ -68,8 +66,10 @@ public class FileBridgeCmisServiceFactory extends AbstractServiceFactory {
     private static final BigInteger DEFAULT_DEPTH_OBJECTS = BigInteger.valueOf(10);
 
     /** Each thread gets its own {@link FileBridgeCmisService} instance. */
-    // old threadLocalService 
-    //private ThreadLocal<CmisServiceWrapper<FileBridgeCmisService>> threadLocalService = new ThreadLocal<CmisServiceWrapper<FileBridgeCmisService>>();
+    // old threadLocalService
+    // private ThreadLocal<CmisServiceWrapper<FileBridgeCmisService>>
+    // threadLocalService = new
+    // ThreadLocal<CmisServiceWrapper<FileBridgeCmisService>>();
     // new CallContextAware threadLocalService
     private ThreadLocal<CallContextAwareCmisService> threadLocalService = new ThreadLocal<CallContextAwareCmisService>();
     // new wrapperManager
@@ -80,24 +80,24 @@ public class FileBridgeCmisServiceFactory extends AbstractServiceFactory {
     private FileBridgeTypeManager typeManager;
 
     @Override
-    public void init(Map<String, String> parameters) {   	
-    	LOG.debug("[FileBridgeCmisServiceFactory] init");
-    	
-    	// New for Chameleon **
-    	wrapperManager = new CmisServiceWrapperManager();
- 	    wrapperManager.addWrappersFromServiceFactoryParameters(parameters);
- 	    wrapperManager.addOuterWrapper(ConformanceCmisServiceWrapper.class, DEFAULT_MAX_ITEMS_TYPES,
- 	                DEFAULT_DEPTH_TYPES, DEFAULT_MAX_ITEMS_OBJECTS, DEFAULT_DEPTH_OBJECTS);
- 	    
- 	    
-    	// *******
- 	    // lets print out the parameters for debugging purposes so we can see what happens to our
- 	    // custom parameters
- 	    for (String currentKey : parameters.keySet()) {
- 	    	LOG.debug("[FileBridgeCmisServiceFactory]Key: " + currentKey + " ->Value:" + parameters.get(currentKey) ); 
- 	    }
- 	    
-    	repositoryManager = new FileBridgeRepositoryManager();
+    public void init(Map<String, String> parameters) {
+        LOG.debug("[FileBridgeCmisServiceFactory] init");
+
+        // New for Chameleon **
+        wrapperManager = new CmisServiceWrapperManager();
+        wrapperManager.addWrappersFromServiceFactoryParameters(parameters);
+        wrapperManager.addOuterWrapper(ConformanceCmisServiceWrapper.class, DEFAULT_MAX_ITEMS_TYPES,
+                DEFAULT_DEPTH_TYPES, DEFAULT_MAX_ITEMS_OBJECTS, DEFAULT_DEPTH_OBJECTS);
+
+        // *******
+        // lets print out the parameters for debugging purposes so we can see
+        // what happens to our
+        // custom parameters
+        for (String currentKey : parameters.keySet()) {
+            LOG.debug("[FileBridgeCmisServiceFactory]Key: " + currentKey + " ->Value:" + parameters.get(currentKey));
+        }
+
+        repositoryManager = new FileBridgeRepositoryManager();
         userManager = new FileBridgeUserManager();
         typeManager = new FileBridgeTypeManager();
 
@@ -116,24 +116,25 @@ public class FileBridgeCmisServiceFactory extends AbstractServiceFactory {
         // CmisPermissionDeniedException
         userManager.authenticate(context);
 
-	    // get service object for this thread
+        // get service object for this thread
         // New for Chameleon **
         CallContextAwareCmisService service = threadLocalService.get();
         if (service == null) {
-        	FileBridgeCmisService fileShareService = new FileBridgeCmisService(repositoryManager);
-        	// wrap it with the chain of wrappers
-    	    service = (CallContextAwareCmisService) wrapperManager.wrap(fileShareService);
-    	    threadLocalService.set(service);    
+            FileBridgeCmisService fileShareService = new FileBridgeCmisService(repositoryManager);
+            // wrap it with the chain of wrappers
+            service = (CallContextAwareCmisService) wrapperManager.wrap(fileShareService);
+            threadLocalService.set(service);
         }
-        	
-		// Stash any object into the call context and then pass it to our service 
-		// so that it can be shared with any extensions. 
-		// Here is where you would put in a reference to a native api object if needed.
-		MutableCallContext mcc = (MutableCallContext)context;	
-		mcc.put("foo","bar");        
+
+        // Stash any object into the call context and then pass it to our
+        // service so that it can be shared with any extensions.
+        // Here is where you would put in a reference to a native API object if
+        // needed.
+        MutableCallContext mcc = (MutableCallContext) context;
+        mcc.put("foo", "bar");
         service.setCallContext(context);
         // ******
-        
+
         return service;
     }
 
