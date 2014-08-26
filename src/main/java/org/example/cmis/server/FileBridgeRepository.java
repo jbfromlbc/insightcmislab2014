@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Florian Müller & Jay Brown
+ * Copyright 2014 Florian Müller & Jay Brown
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,10 +199,12 @@ public class FileBridgeRepository {
         // exercise 1.1
         repositoryInfo.setCmisVersionSupported(cmisVersion.value());
 
+        // exercise 1.2
         repositoryInfo.setProductName("FileBridge Server");
         repositoryInfo.setProductVersion("1.0");
         repositoryInfo.setVendorName("My Company");
 
+        // exercise 1.3
         repositoryInfo.setRootFolder(ROOT_ID);
 
         repositoryInfo.setThinClientUri("");
@@ -1341,7 +1343,7 @@ public class FileBridgeRepository {
             objectInfo.setWorkingCopyOriginalId(null);
         }
 
-        // let's do it
+        // exercise 3.3
         try {
             PropertiesImpl result = new PropertiesImpl();
 
