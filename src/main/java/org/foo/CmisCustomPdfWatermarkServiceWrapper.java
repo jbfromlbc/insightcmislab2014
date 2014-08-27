@@ -210,6 +210,9 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
             // ...
 
             addImageToPage(pdf, 0, 0, 0, 1.0f, buffered);
+            
+            // example of how to set metadata on the document
+            pdf.getDocumentInformation().setTitle("Modified by fileBridge");
         } catch (Exception e) {
             slflog("error watermarking pdf in getContentStream ", e.getMessage());
         }
