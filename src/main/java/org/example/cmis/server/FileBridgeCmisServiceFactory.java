@@ -25,6 +25,7 @@ package org.example.cmis.server;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +118,6 @@ public class FileBridgeCmisServiceFactory extends AbstractServiceFactory {
         userManager.authenticate(context);
 
         // get service object for this thread
-        // New for Chameleon **
         CallContextAwareCmisService service = threadLocalService.get();
         if (service == null) {
             FileBridgeCmisService fileShareService = new FileBridgeCmisService(repositoryManager);
@@ -130,10 +130,10 @@ public class FileBridgeCmisServiceFactory extends AbstractServiceFactory {
         // service so that it can be shared with any extensions.
         // Here is where you would put in a reference to a native API object if
         // needed.
-        MutableCallContext mcc = (MutableCallContext) context;
-        mcc.put("foo", "bar");
-        service.setCallContext(context);
-        // ******
+        FileBridgeCallContext fileBridgeCallContext = new FileBridgeCallContext(context);
+        fileBridgeCallContext.setRequestTimestamp(new GregorianCalendar());
+
+        service.setCallContext(fileBridgeCallContext);
 
         return service;
     }
