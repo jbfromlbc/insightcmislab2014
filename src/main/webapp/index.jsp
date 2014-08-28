@@ -66,7 +66,7 @@
 
 <h3>Authentication</h3>
 
-<p>User: test</br>Password: test</p>
+<p>User: test<br>Password: test</p>
 
 
 <h2>More Information</h2>
