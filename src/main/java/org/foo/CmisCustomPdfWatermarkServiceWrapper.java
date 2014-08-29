@@ -162,6 +162,9 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
                     InputStream modifiedInputStream = out.getInputStream(); // new
                                                                             // ByteArrayInputStream(out.toByteArray());
 
+                    // Extra credit here. Handle offset and length if provided
+                    // by the client.
+
                     // now write the stream back to the ContentStream object
                     retVal = new ContentStreamImpl(retVal.getFileName(), null, "application/pdf", modifiedInputStream);
 
@@ -210,7 +213,7 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
             // ...
 
             addImageToPage(pdf, 0, 0, 0, 1.0f, buffered);
-            
+
             // example of how to set metadata on the document
             pdf.getDocumentInformation().setTitle("Modified by fileBridge");
         } catch (Exception e) {
@@ -239,18 +242,5 @@ public class CmisCustomPdfWatermarkServiceWrapper extends AbstractCmisServiceWra
 
         contentStream.drawXObject(ximage, x, y, ximage.getWidth() * scale, ximage.getHeight() * scale);
         contentStream.close();
-    }
-
-    /**
-     * Code just for showing an example of the findbugs output
-     */
-    private void FindBugsExampleError() {
-        // As a findbugs example
-        String str1 = "";
-        Integer i = 1;
-        if (str1 == i.toString()) {
-            System.out.println("Bad code.  Findbugs example");
-        }
-        // end of findbugs example
     }
 }

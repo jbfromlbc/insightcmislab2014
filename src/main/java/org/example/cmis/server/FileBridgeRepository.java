@@ -227,7 +227,7 @@ public class FileBridgeRepository {
         capabilities.setCapabilityRendition(CapabilityRenditions.NONE);
 
         if (cmisVersion != CmisVersion.CMIS_1_0) {
-            capabilities.setOrderByCapability(CapabilityOrderBy.NONE);
+            capabilities.setCapabilityOrderBy(CapabilityOrderBy.NONE);
 
             NewTypeSettableAttributesImpl typeSetAttributes = new NewTypeSettableAttributesImpl();
             typeSetAttributes.setCanSetControllableAcl(false);
