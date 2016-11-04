@@ -1,0 +1,335 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Hydra API",
+        "description": "An api that manages storage volumes and snapshots in a storage independent way.  Note that authentication is done with certificates for this service.",
+        "termsOfService": "http://www.ibm.com",
+        "contact": {
+            "name": "Hydra API team",
+            "email": "srinib@us.ibm.com",
+            "url": "https://w3-connections.ibm.com/wikis/home?lang=en-us#!/wiki/Wffbb09234a7a_47cd_bc19_fbbad15fd493/page/Container%20Service%20for%20APS"
+        },
+        "license": {
+            "name": "Apache 2",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        }
+    },
+    "host": "localhost",
+    "basePath": "/pvc",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/pv/{namespace}": {
+            "get": {
+                "description": "Returns all persistent volumes the user has access to in the given namespace",
+                "operationId": "list persistent volumes",
+                "produces": [
+                    "application/json",
+                    "text/html"
+                ],
+                "parameters": [
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "description": "Namespace ID to use",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/plain_text"
+                        }
+                    },
+                    "default": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/errorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/snapshot/{namespace}/{pvc}": {
+            "get": {
+                "description": "Returns all snapshots user has access to in the given namespace and pvc",
+                "operationId": "list Snapshots",
+                "produces": [
+                    "application/json",
+                    "text/html"
+                ],
+                "parameters": [
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "description": "Namespace ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "pvc",
+                        "in": "path",
+                        "description": "PVC ID to use",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "snapshot response",
+                        "schema": {
+                            "$ref": "#/definitions/plain_text"
+                        }
+                    },
+                    "default": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/errorModel"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Take a snapshot based on the supplied namespace and pvc",
+                "operationId": "takeSnapshot",
+                "produces": [
+                    "application/json",
+                    "text/html"
+                ],
+                "parameters": [
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "description": "Namespace ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "pvc",
+                        "in": "path",
+                        "description": "PVC ID to use",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/message_response"
+                        }
+                    },
+                    "default": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/errorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/snapshot/{namespace}/{pvc}/{id}": {
+            "get": {
+                "description": "Retrieve snapshot detail info (not implemented)",
+                "operationId": "getSnapshot",
+                "produces": [
+                    "application/json",
+                    "text/html"
+                ],
+                "parameters": [
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "description": "Namespace ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "pvc",
+                        "in": "path",
+                        "description": "PVC ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Snapshot ID to retrieve",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/plain_text"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "404": {
+                        "description": "snapshot not found"
+                    }
+                }
+            },
+            "post": {
+                "description": "Restore a snapshot identified by its id",
+                "operationId": "restoreSnapshot",
+                "produces": [
+                    "application/json",
+                    "text/html"
+                ],
+                "parameters": [
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "description": "Namespace ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "pvc",
+                        "in": "path",
+                        "description": "PVC ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Snapshot ID to restore",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "action",
+                        "in": "body",
+                        "description": "indicate action to perform on snapshot",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/action_type"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "snapshot response",
+                        "schema": {
+                            "$ref": "#/definitions/plain_text"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "default": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/errorModel"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a single snapshot",
+                "operationId": "deleteSnapshot",
+                "produces": [
+                    "application/json",
+                    "text/html"
+                ],
+                "parameters": [
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "description": "Namespace ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "pvc",
+                        "in": "path",
+                        "description": "PVC ID to use",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Snapshot ID to retrieve",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid ID supplied"
+                    },
+                    "default": {
+                        "description": "unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/errorModel"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "action_type": {
+            "type": "object",
+            "required": [
+                "action"
+            ],
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": [
+                        "restore",
+                        "no_action"
+                    ]
+                }
+            }
+        },
+        "plain_text": {
+            "type": "string"
+        },
+        "message_response": {
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "errorModel": {
+            "type": "object",
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
