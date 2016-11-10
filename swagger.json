@@ -16,7 +16,7 @@
         }
     },
     "host": "localhost",
-    "basePath": "/pvc",
+    "basePath": "/",
     "schemes": [
         "http"
     ],
@@ -29,7 +29,7 @@
     "paths": {
         "/api": {
             "get": {
-                "description": "Returns the swagger YAML description in for this service",
+                "description": "Returns the swagger YAML description in for this service including all of the versions that are currently supported.",
                 "operationId": "GetYaml",
                 "produces": [
                     "text/html"
@@ -50,7 +50,7 @@
                 }
             }
         },
-        "/pv/{namespace}": {
+        "/v1/pv/{namespace}": {
             "get": {
                 "description": "Returns all persistent volumes the user has access to in the given namespace",
                 "operationId": "ListPersistentVolumes",
@@ -83,7 +83,7 @@
                 }
             }
         },
-        "/snapshot/{namespace}/{pvc}": {
+        "/v1/snapshot/{namespace}/{pvc}": {
             "get": {
                 "description": "Returns all snapshots user has access to in the given namespace and pvc",
                 "operationId": "ListSnapshots",
@@ -161,7 +161,7 @@
                 }
             }
         },
-        "/snapshot/{namespace}/{pvc}/{id}": {
+        "/v1/snapshot/{namespace}/{pvc}/{id}": {
             "get": {
                 "description": "Retrieve snapshot detail info (not implemented)",
                 "operationId": "RetrieveSnapshot",
